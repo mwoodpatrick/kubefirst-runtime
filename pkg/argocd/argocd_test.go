@@ -24,7 +24,7 @@ func TestArgoCDLivenessIntegration(t *testing.T) {
 	}
 
 	config := configs.ReadConfig()
-	err := pkg.SetupViper(config)
+	err := pkg.SetupViper(config, true)
 	if err != nil {
 		t.Error(err)
 	}
@@ -59,7 +59,7 @@ func TestArgoWorkflowLivenessIntegration(t *testing.T) {
 	}
 
 	config := configs.ReadConfig()
-	err := pkg.SetupViper(config)
+	err := pkg.SetupViper(config, true)
 	if err != nil {
 		t.Error(err)
 	}

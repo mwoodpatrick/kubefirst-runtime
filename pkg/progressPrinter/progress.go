@@ -7,10 +7,11 @@ See the LICENSE file for more details.
 package progressPrinter
 
 import (
-	"flag"
 	"fmt"
 	"sync"
 	"time"
+
+	flag "github.com/spf13/pflag"
 
 	"github.com/jedib0t/go-pretty/v6/progress"
 	"github.com/jedib0t/go-pretty/v6/text"

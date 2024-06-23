@@ -36,6 +36,7 @@ type Config struct {
 	LocalArchitecture string
 	HomePath          string
 
+	ConfigName              string `env:"CONFIG_NAME"`
 	ClusterName             string `env:"CLUSTER_NAME"`
 	GitopsRepoPath          string
 	KubefirstLogPath        string `env:"KUBEFIRST_LOG_PATH" envDefault:"logs"`
@@ -136,8 +137,8 @@ func ReadConfig() *Config {
 	config.K1Dir = fmt.Sprintf("%s/.k1", homePath)
 
 	config.K1ToolsPath = fmt.Sprintf("%s/tools", config.K1FolderPath)
-	config.KubefirstConfigFileName = ".kubefirst"
-	config.KubefirstConfigFilePath = fmt.Sprintf("%s/%s", homePath, config.KubefirstConfigFileName)
+	config.KubefirstConfigFileName = config.ConfigName
+	config.KubefirstConfigFilePath = fmt.Sprintf("%s/configs/%s", config.K1FolderPath, config.KubefirstConfigFileName)
 
 	config.GitopsRepoPath = fmt.Sprintf("%s/gitops", config.K1FolderPath)
 	config.K1ToolsPath = fmt.Sprintf("%s/tools", config.K1FolderPath)
