@@ -122,6 +122,8 @@ type Config struct {
 func ReadConfig() *Config {
 	config := Config{}
 
+	config.ConfigName = "kubefirst" // Deafult config name
+
 	if err := env.Parse(&config); err != nil {
 		log.Fatal().Msgf("something went wrong loading the environment variables: %s", err)
 	}
