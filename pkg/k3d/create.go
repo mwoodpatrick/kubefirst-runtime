@@ -112,11 +112,13 @@ func PrepareGitRepositories(
 	gitopsDir string,
 	gitopsTemplateBranch string,
 	gitopsTemplateURL string,
+	gitopsRepoName string,
 	DestinationMetaphorRepoURL string,
 	k1Dir string,
 	gitopsTokens *GitopsDirectoryValues,
 	metaphorDir string,
 	metaphorTokens *MetaphorTokenValues,
+	metaphorRepoName string,
 	gitProtocol string,
 	removeAtlantis bool,
 ) error {
@@ -129,14 +131,14 @@ func PrepareGitRepositories(
 	log.Info().Msg("gitops repository clone complete")
 
 	// * adjust the content for the gitops repo
-	err = AdjustGitopsRepo(CloudProvider, clusterName, clusterType, gitopsDir, gitProvider, k1Dir, removeAtlantis)
+	err = AdjustGitopsRepo(CloudProvider, clusterName, clusterType, gitopsDir, gitopsRepoName, gitProvider, k1Dir, removeAtlantis)
 	if err != nil {
 		log.Info().Msgf("err: %v", err)
 		return err
 	}
 
 	// * detokenize the gitops repo
-	detokenizeGitGitops(gitopsDir, gitopsTokens, gitProtocol)
+	err = detokenizeGitGitops(gitopsDir, gitopsTokens, gitProtocol)
 	if err != nil {
 		return err
 	}
@@ -149,13 +151,13 @@ func PrepareGitRepositories(
 
 	// ! metaphor
 	// * adjust the content for the gitops repo
-	err = AdjustMetaphorRepo(DestinationMetaphorRepoURL, gitopsDir, gitProvider, k1Dir)
+	err = AdjustMetaphorRepo(DestinationMetaphorRepoURL, gitopsDir, metaphorRepoName, gitProvider, k1Dir)
 	if err != nil {
 		return err
 	}
 
 	// * detokenize the gitops repo
-	detokenizeGitMetaphor(metaphorDir, metaphorTokens)
+	err = detokenizeGitMetaphor(metaphorDir, metaphorTokens)
 	if err != nil {
 		return err
 	}

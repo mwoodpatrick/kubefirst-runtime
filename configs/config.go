@@ -138,12 +138,11 @@ func ReadConfig() *Config {
 	config.GitopsDir = fmt.Sprintf("%s/.k1/gitops", homePath)
 	config.K1Dir = fmt.Sprintf("%s/.k1", homePath)
 
-	config.K1ToolsPath = fmt.Sprintf("%s/tools", config.K1FolderPath)
+	config.K1ToolsPath = fmt.Sprintf("%s/configs/%s/tools", config.K1FolderPath, config.ConfigName)
 	config.KubefirstConfigFileName = config.ConfigName
-	config.KubefirstConfigFilePath = fmt.Sprintf("%s/configs/%s", config.K1FolderPath, config.KubefirstConfigFileName)
+	config.KubefirstConfigFilePath = fmt.Sprintf("%s/configs/%s/config.yaml", config.K1FolderPath, config.KubefirstConfigFileName)
 
-	config.GitopsRepoPath = fmt.Sprintf("%s/gitops", config.K1FolderPath)
-	config.K1ToolsPath = fmt.Sprintf("%s/tools", config.K1FolderPath)
+	config.GitopsRepoPath = fmt.Sprintf("%s/configs/%s/gitops", config.K1FolderPath, config.ConfigName)
 	config.KubeConfigFolder = fmt.Sprintf("%s/terraform/civo", config.GitopsRepoPath) // civo cant be hardcoded anywhere
 	config.KubeConfigPath = fmt.Sprintf("%s/terraform/civo/kubeconfig", config.GitopsRepoPath)
 

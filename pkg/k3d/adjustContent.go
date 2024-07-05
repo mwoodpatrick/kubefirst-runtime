@@ -20,7 +20,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func AdjustGitopsRepo(cloudProvider, clusterName, clusterType, gitopsRepoDir, gitProvider, k1Dir string, removeAtlantis bool) error {
+func AdjustGitopsRepo(cloudProvider, clusterName, clusterType, gitopsRepoDir, gitopsRepoName, gitProvider, k1Dir string, removeAtlantis bool) error {
 
 	//* clean up all other platforms
 	for _, platform := range pkg.SupportedPlatforms {
@@ -71,15 +71,34 @@ func AdjustGitopsRepo(cloudProvider, clusterName, clusterType, gitopsRepoDir, gi
 		os.Remove(armConsoleFileLocation)
 	}
 
-	if (removeAtlantis) {
+	if removeAtlantis {
 		atlantisRegistryFileLocation := fmt.Sprintf("%s/atlantis.yaml", registryLocation)
 		os.Remove(atlantisRegistryFileLocation)
 	}
 
-	return nil
+	path := fmt.Sprintf("%s/%s", gitopsRepoDir, "terraform/github/repos.tf")
+	tmplpath := fmt.Sprintf("%s/%s", gitopsRepoDir, "terraform/github/repos.tf.tmpl")
+	err = cp.Copy(tmplpath, path)
+
+	if err != nil {
+		log.Info().Msgf("Error problem copying %s to %s error: %s",
+			tmplpath, path, err.Error())
+		return err
+	}
+
+	pattern := fmt.Sprintf("s/GITOPS_REPO_NAME/\"%s\"/", gitopsRepoName)
+	_, _, err = pkg.ExecShellReturnStrings("sed", "-i", pattern, path)
+
+	if err != nil {
+		log.Info().Msgf("Error problem replacing gitops directory name with gitopsRepoName=%s path=%s pattern=%s error: %s",
+			gitopsRepoName, path, pattern, err.Error())
+		return err
+	}
+
+	return err
 }
 
-func AdjustMetaphorRepo(destinationMetaphorRepoGitURL, gitopsRepoDir, gitProvider, k1Dir string) error {
+func AdjustMetaphorRepo(destinationMetaphorRepoGitURL, gitopsRepoDir, metaphorRepoName, gitProvider, k1Dir string) error {
 
 	//* create ~/.k1/metaphor
 	metaphorDir := fmt.Sprintf("%s/metaphor", k1Dir)
@@ -173,10 +192,25 @@ func AdjustMetaphorRepo(destinationMetaphorRepoGitURL, gitopsRepoDir, gitProvide
 	if err != nil {
 		return fmt.Errorf("error removing previous git ref: %s", err)
 	}
+
+	// replace metaphore repo name in repos.tf
+	path := fmt.Sprintf("%s/terraform/github/repos.tf", gitopsRepoDir)
+	pattern := fmt.Sprintf("s/METAPHOR_REPO_NAME/\"%s\"/", metaphorRepoName)
+	_, _, err = pkg.ExecShellReturnStrings("sed", "-i", pattern, path)
+	if err != nil {
+		return fmt.Errorf("error replacing gitops repo name in repos.tf: %s", err)
+	}
+
 	// create remote
 	_, err = metaphorRepo.CreateRemote(&config.RemoteConfig{
 		Name: "origin",
 		URLs: []string{destinationMetaphorRepoGitURL},
 	})
-	return nil
+
+	if err != nil {
+		return fmt.Errorf("error problem creating Metaphore repo: URL=%s: %s",
+			destinationMetaphorRepoGitURL, err)
+	}
+
+	return err
 }

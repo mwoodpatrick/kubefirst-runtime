@@ -66,10 +66,12 @@ type K3dConfig struct {
 	MkCertSSLSecretDir              string
 	TerraformClient                 string
 	ToolsDir                        string
+	GitopsRepoName                  string
+	MetaphorRepoName                string
 }
 
 // GetConfig - load default values from kubefirst installer
-func GetConfig(clusterName string, gitProvider string, gitOwner string, gitProtocol string) *K3dConfig {
+func GetConfig(configName string, clusterName string, gitopsRepoName string, metaphorRepoName string, gitProvider string, gitOwner string, gitProtocol string) *K3dConfig {
 	config := K3dConfig{}
 
 	if err := env.Parse(&config); err != nil {
@@ -90,25 +92,27 @@ func GetConfig(clusterName string, gitProvider string, gitOwner string, gitProto
 		cGitHost = GitlabHost
 	}
 
-	config.DestinationGitopsRepoURL = fmt.Sprintf("https://%s/%s/%s-gitops.git", cGitHost, gitOwner, clusterName)
-	config.DestinationGitopsRepoGitURL = fmt.Sprintf("git@%s:%s/%s-gitops.git", cGitHost, gitOwner, clusterName)
-	config.DestinationMetaphorRepoURL = fmt.Sprintf("https://%s/%s/%s-metaphor.git", cGitHost, gitOwner, clusterName)
-	config.DestinationMetaphorRepoGitURL = fmt.Sprintf("git@%s:%s/%s-metaphor.git", cGitHost, gitOwner, clusterName)
+	config.GitopsRepoName = gitopsRepoName
+	config.MetaphorRepoName = metaphorRepoName
+	config.DestinationGitopsRepoURL = fmt.Sprintf("https://%s/%s/%s.git", cGitHost, gitOwner, gitopsRepoName)
+	config.DestinationGitopsRepoGitURL = fmt.Sprintf("git@%s:%s/%s.git", cGitHost, gitOwner, gitopsRepoName)
+	config.DestinationMetaphorRepoURL = fmt.Sprintf("https://%s/%s/%s.git", cGitHost, gitOwner, metaphorRepoName)
+	config.DestinationMetaphorRepoGitURL = fmt.Sprintf("git@%s:%s/%s.git", cGitHost, gitOwner, metaphorRepoName)
 
-	config.GitopsDir = fmt.Sprintf("%s/.k1/%s/gitops", homeDir, clusterName)
+	config.GitopsDir = fmt.Sprintf("%s/.k1/configs/%s/gitops", homeDir, configName)
 	config.GitProvider = gitProvider
 	config.GitProtocol = gitProtocol
-	config.K1Dir = fmt.Sprintf("%s/.k1/%s", homeDir, clusterName)
-	config.K3dClient = fmt.Sprintf("%s/.k1/%s/tools/k3d", homeDir, clusterName)
-	config.KubectlClient = fmt.Sprintf("%s/.k1/%s/tools/kubectl", homeDir, clusterName)
-	config.Kubeconfig = fmt.Sprintf("%s/.k1/%s/kubeconfig", homeDir, clusterName)
-	config.KubefirstConfig = fmt.Sprintf("%s/.k1/%s/%s", homeDir, clusterName, ".kubefirst")
-	config.MetaphorDir = fmt.Sprintf("%s/.k1/%s/metaphor", homeDir, clusterName)
-	config.MkCertClient = fmt.Sprintf("%s/.k1/%s/tools/mkcert", homeDir, clusterName)
-	config.MkCertPemDir = fmt.Sprintf("%s/.k1/%s/ssl/%s/pem", homeDir, clusterName, DomainName)
-	config.MkCertSSLSecretDir = fmt.Sprintf("%s/.k1/%s/ssl/%s/secrets", homeDir, clusterName, DomainName)
-	config.TerraformClient = fmt.Sprintf("%s/.k1/%s/tools/terraform", homeDir, clusterName)
-	config.ToolsDir = fmt.Sprintf("%s/.k1/%s/tools", homeDir, clusterName)
+	config.K1Dir = fmt.Sprintf("%s/.k1/configs/%s", homeDir, configName)
+	config.K3dClient = fmt.Sprintf("%s/.k1/configs/%s/tools/k3d", homeDir, configName)
+	config.KubectlClient = fmt.Sprintf("%s/.k1/configs/%s/tools/kubectl", homeDir, configName)
+	config.Kubeconfig = fmt.Sprintf("%s/.k1/configs/%s/kubeconfig", homeDir, configName)
+	config.KubefirstConfig = fmt.Sprintf("%s/.k1/configs/%s/%s", homeDir, configName, ".kubefirst")
+	config.MetaphorDir = fmt.Sprintf("%s/.k1/configs/%s/metaphor", homeDir, configName)
+	config.MkCertClient = fmt.Sprintf("%s/.k1/configs/%s/tools/mkcert", homeDir, configName)
+	config.MkCertPemDir = fmt.Sprintf("%s/.k1/configs/%s/ssl/%s/pem", homeDir, configName, DomainName)
+	config.MkCertSSLSecretDir = fmt.Sprintf("%s/.k1/configs/%s/ssl/%s/secrets", homeDir, configName, DomainName)
+	config.TerraformClient = fmt.Sprintf("%s/.k1/configs/%s/tools/terraform", homeDir, configName)
+	config.ToolsDir = fmt.Sprintf("%s/.k1/configs/%s/tools", homeDir, configName)
 
 	return &config
 }
